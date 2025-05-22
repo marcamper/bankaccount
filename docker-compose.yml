@@ -2,12 +2,14 @@ version: '3.8'
 
 services:
   app:
+    container_name: bankaccount-app
     build: .
     ports:
       - "8080:80"
     volumes:
       - ./src:/var/www/html/src
       - ./public:/var/www/html/public
+      - ./tests:/var/www/html/tests
     depends_on:
       - db
     environment:

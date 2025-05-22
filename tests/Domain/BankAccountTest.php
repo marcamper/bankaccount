@@ -5,11 +5,12 @@ namespace Tests\Unit\Domain;
 
 use Domain\BankAccount;
 use Domain\Currency;
-use Domain\DailyDebitLimitExceededException;
-use Domain\InsufficientFundsException;
 use Domain\Money;
 use Domain\Payment;
 use Domain\TransactionType;
+use Domain\exceptions\InsufficientFundsException;
+use Domain\exceptions\CurrencyMismatchException;
+use Domain\exceptions\DailyDebitLimitExceededException;
 use PHPUnit\Framework\TestCase;
 
 class BankAccountTest extends TestCase
@@ -73,7 +74,7 @@ class BankAccountTest extends TestCase
 
         $debitPayment = new Payment(new Money(10, $usd), TransactionType::DEBIT);
 
-        $this->expectException(\Domain\CurrencyMismatchException::class);
+        $this->expectException(CurrencyMismatchException::class);
 
         $this->account->debit($debitPayment);
     }

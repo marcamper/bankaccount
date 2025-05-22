@@ -47,53 +47,54 @@ This will:
 Build PHP/Apache container with application,
 Start MySQL container with initialized user, database, and password,
 Mount source code for live edit (optional).
-3. **Using provided init script:**
 
-null.
 
-Option B) Manual run (only if needed):
-
-docker exec -it YOUR_DB_CONTAINER_NAME mysql -u user -ppassword bank < db/schema.sql
-You can find the DB container name by:
-
-docker ps
-Accessing the application
+## Accessing the application
 Open browser at http://localhost:8080
-This loads the minimal HTML frontend.
-API endpoints (all requests to http://localhost:8080/api.php?action=...):
-| Action | Method | Description | | ----------------- | ------ | --------------------------------------- | | create-account | POST | Create new account (id, currency) | | payment | POST | Make credit or debit payment on account | | balance | GET | Get current balance | | history | GET | Get payments history |
 
-How to use the frontend
+This loads the minimal HTML frontend.
+
+API endpoints (all requests to http://localhost:8080/api.php?action=...):
+
+| Action          | Method | Description                              |
+|-----------------|--------|------------------------------------------|
+| create-account  | POST   | Create new account (id, currency)        |
+| payment         | POST   | Make credit or debit payment on account  |
+| balance         | GET    | Get current balance                       |
+| history         | GET    | Get payments history                      |
+
+
+## How to use the frontend
 Fill the “Create Account” form (choose ID and currency).
 Then use “Make Payment” form to credit or debit money.
 View balance and payments history with provided buttons.
 The frontend communicates with backend REST API.
 
-Running unit tests
-Enter the app container (replace container_id):
-docker exec -it <container_id_or_name> bash
-2.
+## Running unit tests
+Enter the app container:
+``` bash
+docker exec -it bankaccount-app bash
+```
 
+2. All domain unit tests are located in tests/ directory.
+``` bash
 ./vendor/bin/phpunit tests/
-All domain unit tests are located in tests/ directory.
+```
 
-Notes on payment saving implementation
-Current approach
+
+## Notes on payment saving implementation
+### Current approach
 In the repository, when saving payments, all existing payments for a bank account are deleted and all current payments are re-inserted. This is a simplification done to speed up development and keep the code simple.
 
-How it should be done professionally
+### How it should be done professionally
 Each payment should have a unique ID so new, updated, and deleted payments can be tracked.
 The repository should perform incremental database operations:
-Insert only new payments,
-Update modified payments,
-Delete removed payments,
+- Insert only new payments,
+- Update modified payments,
+- Delete removed payments,
+
 This approach improves efficiency, concurrency safety, and maintainability.
 ORMs like Doctrine can automate this with Unit of Work patterns.
-Troubleshooting
-If ports 8080 or 3306 are occupied, edit docker-compose.yml to change ports.
-If the database doesn't initialize, ensure the volume is clean or remove dbdata volume:
-docker-compose down -v
-docker-compose up -d --build
 
 ## Contact
 For questions, please contact: Marcin Brzeziński (marcamper@gmail.com)
