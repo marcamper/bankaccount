@@ -1,5 +1,4 @@
 <?php
-// src/Infrastructure/Persistence/MySqlBankAccountRepository.php
 declare(strict_types=1);
 
 namespace Infrastructure\Persistence;

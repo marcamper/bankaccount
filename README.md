@@ -81,20 +81,37 @@ docker exec -it bankaccount-app bash
 ./vendor/bin/phpunit tests/
 ```
 
-
 ## Notes on payment saving implementation
 ### Current approach
-In the repository, when saving payments, all existing payments for a bank account are deleted and all current payments are re-inserted. This is a simplification done to speed up development and keep the code simple.
+To avoid duplicates and keep implementation simple in this demo/recruitment task, all existing payments for the account are deleted from the database, and then all payments currently held in the BankAccount entity are re-inserted a new.
+## Production-grade implementation should:
+1. Assign a unique identifier (e.g. UUID or auto-increment ID) to each Payment.
+   That allows detection of new versus existing payments.
+   - Payment entity/value object would have a unique ID property.
 
-### How it should be done professionally
-Each payment should have a unique ID so new, updated, and deleted payments can be tracked.
-The repository should perform incremental database operations:
-- Insert only new payments,
-- Update modified payments,
-- Delete removed payments,
+2. Implement change tracking in the domain or repository layer:
+   - Track which payments are newly added, which remain unchanged,
+   and which were removed from the BankAccount's payment collection.
 
-This approach improves efficiency, concurrency safety, and maintainability.
-ORMs like Doctrine can automate this with Unit of Work patterns.
+3. In the repository's save() method:
+   - Insert only new payments,
+   - Update modified payments (if mutation is allowed),
+   - Delete payments that were removed since last synchronization.
+
+4. Use database transactions to ensure atomicity and avoid race conditions.
+
+5. Optionally, use an ORM (like Doctrine) that supports Unit of Work patterns,
+   automating tracking and persisting changes with minimal boilerplate.
+
+### Benefits of this approach:
+   - Much better performance with large numbers of payments,
+   - Preserving Payment IDs allows referencing payments elsewhere,
+   - Cleaner concurrency and audit handling,
+   - Ability to extend payment model with more fields or update payments.
+
+### SUMMARY:
+The current "delete all and insert all" is acceptable for a small demo or prototype,
+but production systems require careful tracking of entity states and incremental persistence.
 
 ## Contact
 For questions, please contact: Marcin Brzeziński (marcamper@gmail.com)
