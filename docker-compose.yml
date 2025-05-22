@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:80"
+    volumes:
+      - ./src:/var/www/html/src
+      - ./public:/var/www/html/public
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_NAME: bank
+      DB_USER: user
+      DB_PASS: password
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: bank
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: rootpassword
+    volumes:
+      - dbdata:/var/lib/mysql
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    ports:
+      - "3306:3306"
+
+volumes:
+  dbdata:
